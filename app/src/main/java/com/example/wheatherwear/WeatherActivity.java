@@ -209,6 +209,7 @@ public class WeatherActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
     }
 
     /**
