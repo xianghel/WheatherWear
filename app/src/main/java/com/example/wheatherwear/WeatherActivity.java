@@ -69,9 +69,14 @@ public class WeatherActivity extends AppCompatActivity {
 
     private ImageView bingPicImg;
 
-    private String mWeatherId="CN101180801";
+    private String mWeatherId;
+
+    private String latitude;
+    private String longitude;
 
     private final String TAG = "WeatherActivity";
+
+    private static final String Cloudy = "多云";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,20 +105,30 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navButton = (Button) findViewById(R.id.nav_button);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
-        if (weatherString != null) {
-            // 有缓存时直接解析天气数据
-            Weather weather = Utility.handleWeatherResponse(weatherString);
-            //mWeatherId = weather.basic.weatherId;
-            showWeatherInfo(weather);
-        } else {
-            // 无缓存时去服务器查询天气
-            //mWeatherId = getIntent().getStringExtra("weather_id");
-            weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(mWeatherId);
-        }
-        requestWeather(mWeatherId);
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        String weatherString = prefs.getString("weather", null);
+//        if (weatherString != null) {
+//            // 有缓存时直接解析天气数据
+//            Weather weather = Utility.handleWeatherResponse(weatherString);
+//            mWeatherId = weather.basic.weatherId;
+//            showWeatherInfo(weather);
+//        } else {
+//            // 无缓存时去服务器查询天气
+//            mWeatherId = getIntent().getStringExtra("weather_id");
+//            if (mWeatherId == null) {
+//                latitude = getIntent().getStringExtra("latitude");
+//                longitude = getIntent().getStringExtra("longitude");
+//                Log.d(TAG, "经度：" + latitude + "纬度：" + longitude);
+//                requestWeatherByJingwei(latitude, longitude);
+//            } else {
+//                weatherLayout.setVisibility(View.INVISIBLE);
+//                requestWeather(mWeatherId);
+//            }
+//        }
+        latitude = getIntent().getStringExtra("latitude");
+        longitude = getIntent().getStringExtra("longitude");
+        Log.d(TAG, "经度：" + latitude + "纬度：" + longitude);
+        requestWeatherByJingwei(latitude, longitude);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -126,12 +141,11 @@ public class WeatherActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
-        String bingPic = prefs.getString("bing_pic", null);
-        if (bingPic != null) {
-            Glide.with(this).load(bingPic).into(bingPicImg);
-        } else {
-            loadBingPic();
-        }
+//        String bingPic = prefs.getString("bing_pic", null);
+//        if (bingPic != null) {
+//            Glide.with(this).load(bingPic).into(bingPicImg);
+//        } else {
+//        }
     }
 
     /**
@@ -139,7 +153,7 @@ public class WeatherActivity extends AppCompatActivity {
      */
     public void requestWeather(final String weatherId) {
         String weatherUrl = "https://free-api.heweather.net/s6/weather?location=" + weatherId + "&key=bf530e2a48ca4e66bc5315dae80f494d";
-        Log.d(TAG,weatherUrl);
+        Log.d(TAG, weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -153,9 +167,9 @@ public class WeatherActivity extends AppCompatActivity {
                                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                                 editor.putString("weather", responseText);
                                 editor.apply();
-                                //mWeatherId = weather.basic.weatherId;
+                                mWeatherId = weather.basic.weatherId;
                                 showWeatherInfo(weather);
-                            }else{
+                            } else {
                                 Log.d(TAG, "天气状态不ok");
                                 Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                             }
@@ -181,14 +195,63 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
-        loadBingPic();
     }
 
     /**
-     * 加载必应每日一图
+     * 根据根据经纬度请求城市天气信息。
      */
-    private void loadBingPic() {
-        String requestBingPic = "http://guolin.tech/api/bing_pic";
+    public void requestWeatherByJingwei(final String latitude, final String longitude) {
+        String weatherUrl = "https://free-api.heweather.net/s6/weather?location=" + latitude + "," + longitude + "&key=bf530e2a48ca4e66bc5315dae80f494d";
+        Log.d(TAG, weatherUrl);
+        HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                final Weather weather = Utility.handleWeatherResponse(responseText);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (weather != null) {
+                            if ("ok".equals(weather.status)) {
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                                editor.putString("weather", responseText);
+                                editor.apply();
+                                mWeatherId = weather.basic.weatherId;
+                                showWeatherInfo(weather);
+                            } else {
+                                Log.d(TAG, "天气状态不ok");
+                                Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.d(TAG, "天气为空");
+                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        }
+                        swipeRefresh.setRefreshing(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "网络有错");
+                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 加载必应每日一图//必应不行，初步解决是每种天气情况对应一张美图
+     */
+    private void loadBingPic(String weatherInfo) {
+        Log.d(TAG,"loadBingPic()");
+       /* String requestBingPic = "http://guolin.tech/api/bing_pic";
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -208,18 +271,26 @@ public class WeatherActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
             }
-        });
+        });*/
 
+       switch (weatherInfo) {
+            case Cloudy:
+                Glide.with(WeatherActivity.this).load(R.drawable.cloudy).into(bingPicImg);
+                break;
+            default:
+        }
     }
 
     /**
      * 处理并展示Weather实体类中的数据。
      */
     private void showWeatherInfo(Weather weather) {
+        Log.d(TAG,"showWeatherInfo()");
         String cityName = weather.basic.cityName;
         String updateTime = weather.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
         String weatherInfo = weather.now.more;
+        loadBingPic(weatherInfo);
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
         degreeText.setText(degree);
