@@ -7,11 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 
     <application
@@ -24,9 +24,14 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="TZIFUIcB21LG9UwbBwfmQEdKFvCvaCkS"/>
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".WeatherActivity">
+            android:value="TZIFUIcB21LG9UwbBwfmQEdKFvCvaCkS" />
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation"></activity>
+        <activity
+            android:name=".WeatherActivity"
+            android:configChanges="orientation">
 
         </activity>
         <activity android:name=".LBSActivity">
@@ -36,7 +41,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.baidu.location.f" android:exported="true"
+
+        <service
+            android:name="com.baidu.location.f"
+            android:exported="true"
             android:process=":romote"></service>
     </application>
 

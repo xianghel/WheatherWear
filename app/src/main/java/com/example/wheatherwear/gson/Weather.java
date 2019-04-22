@@ -13,8 +13,6 @@ public class Weather {
 
     public Basic basic;
 
-    public AQI aqi;
-
     public Now now;
 
     //public Suggestion suggestion;
@@ -24,4 +22,6 @@ public class Weather {
     public List<Forecast> forecastList;
     @SerializedName("lifestyle")
     public List<Suggestion> suggestionList;
+    @SerializedName("hourly")
+    public List<Hourly> hourlyList;
 }
