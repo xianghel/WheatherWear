@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +20,9 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,9 +37,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.wheatherwear.adapter.ClothesAdapter;
+import com.example.wheatherwear.bean.ImageBean;
 import com.example.wheatherwear.bean.LabelBean;
+import com.example.wheatherwear.db.Coat;
+import com.example.wheatherwear.db.Inside;
+import com.example.wheatherwear.db.Pants;
+import com.example.wheatherwear.db.Skirt;
 import com.example.wheatherwear.util.SDCardUtil;
 import com.example.labels.LabelsView;
+
+import org.litepal.crud.DataSupport;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -45,6 +56,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClothesActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -76,6 +88,15 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
 
     private AlertDialog customizeDialog;
 
+    private int category;
+    private String name;
+
+    private List<Coat> coatList = new ArrayList<>();
+    private List<Inside> insideList = new ArrayList<>();
+    private List<Pants> pantsList = new ArrayList<>();
+    private List<Skirt> skirtList = new ArrayList<>();
+    private List<ImageBean> imageList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +106,47 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
         initView();
         checkPermission();
         initDir();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initClothes();
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        ClothesAdapter adapter = new ClothesAdapter(imageList);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void initClothes() {
+        imageList.clear();
+        switch (TYPE) {
+            case 0:
+                coatList = DataSupport.findAll(Coat.class);
+                for (Coat coat : coatList) {
+                    imageList.add(new ImageBean(coat.getId(),coat.getFilePath(), coat.getName()));
+                }
+                break;
+            case 1:
+                skirtList = DataSupport.findAll(Skirt.class);
+                for (Skirt skirt : skirtList) {
+                    imageList.add(new ImageBean(skirt.getId(),skirt.getFilePath(), skirt.getName()));
+                }
+                break;
+            case 2:
+                insideList = DataSupport.findAll(Inside.class);
+                for (Inside inside : insideList) {
+                    imageList.add(new ImageBean(inside.getId(),inside.getFilePath(), inside.getName()));
+                }
+                break;
+            case 3:
+                pantsList = DataSupport.findAll(Pants.class);
+                for (Pants pants : pantsList) {
+                    imageList.add(new ImageBean(pants.getId(),pants.getFilePath(), pants.getName()));
+                }
+                break;
+            default:
+        }
     }
 
     private void initView() {
@@ -186,7 +248,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void handleImageOnKitKat(Intent data) {
-        String imagePath=null;
+        String imagePath = null;
         Uri uri = data.getData();
         if (DocumentsContract.isDocumentUri(this, uri)) {
             String docId = DocumentsContract.getDocumentId(uri);
@@ -205,7 +267,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
         }
         File outputImage = new File(dir, System.currentTimeMillis() + ".jpg");
         path = outputImage.getPath();
-        saveBitmap(path,openBitmap(imagePath));
+        saveBitmap(path, openBitmap(imagePath));
         showPhotoConfirmationDialog();
     }
 
@@ -252,20 +314,65 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.coat:
                 TYPE = COAT;
                 setLayoutBackGround();
+                onResume();
                 break;
             case R.id.skirt:
                 TYPE = SKIRT;
                 setLayoutBackGround();
+                onResume();
                 break;
             case R.id.inside:
                 TYPE = INSIDE;
                 setLayoutBackGround();
+                onResume();
                 break;
             case R.id.pants:
                 TYPE = PANTS;
                 setLayoutBackGround();
+                onResume();
+                break;
             case R.id.add_ok:
+                saveDataInDB();
                 customizeDialog.dismiss();
+                onResume();
+                break;
+            case R.id.cancel_image:
+                new File(path).delete();
+                customizeDialog.dismiss();
+                break;
+            default:
+        }
+    }
+
+    private void saveDataInDB() {
+        switch (TYPE) {
+            case 0:
+                Coat coat = new Coat();
+                coat.setCategory(category);
+                coat.setFilePath(path);
+                coat.setName(name);
+                coat.save();
+                break;
+            case 1:
+                Skirt skirt = new Skirt();
+                skirt.setCategory(category);
+                skirt.setFilePath(path);
+                skirt.setName(name);
+                skirt.save();
+                break;
+            case 2:
+                Inside inside = new Inside();
+                inside.setCategory(category);
+                inside.setFilePath(path);
+                inside.setName(name);
+                inside.save();
+                break;
+            case 3:
+                Pants pants = new Pants();
+                pants.setCategory(category);
+                pants.setFilePath(path);
+                pants.setName(name);
+                pants.save();
                 break;
             default:
         }
@@ -312,6 +419,8 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
         Glide.with(this).load(path).into(imageView);
         labelsView = dialogView.findViewById(R.id.labels);
         setLabelList();
+        ImageView cancelImage = dialogView.findViewById(R.id.cancel_image);
+        cancelImage.setOnClickListener(this);
         customizeDialog = customizeDialogBuilder.create();
         customizeDialog.show();
     }
@@ -367,19 +476,19 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void setLabels(ArrayList<LabelBean> list) {
+    private void setLabels(final ArrayList<LabelBean> list) {
         labelsView.setLabels(list, new LabelsView.LabelTextProvider<LabelBean>() {
             @Override
             public CharSequence getLabelText(TextView label, int position, LabelBean data) {
                 return data.getName();
             }
         });
-        labelsView.setSelectType(LabelsView.SelectType.SINGLE_IRREVOCABLY);
+        labelsView.setSelectType(LabelsView.SelectType.SINGLE);
         labelsView.setOnLabelClickListener(new LabelsView.OnLabelClickListener() {
             @Override
             public void onLabelClick(TextView label, Object data, int position) {
-                Toast.makeText(ClothesActivity.this, position + " : " + data,
-                        Toast.LENGTH_LONG).show();
+                category = list.get(position).getId();
+                name = list.get(position).getName();
             }
         });
     }

@@ -1,6 +1,8 @@
 package com.example.wheatherwear.db;
 
-public class Pants {
+import org.litepal.crud.DataSupport;
+
+public class Pants  extends DataSupport {
     private int id;
 
     public int getId() {
@@ -19,11 +21,11 @@ public class Pants {
         this.filePath = filePath;
     }
 
-    public String getCategory() {
+    public int getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(int category) {
         this.category = category;
     }
 
@@ -37,5 +39,5 @@ public class Pants {
 
     private String name;
     private String filePath;
-    private String category;
+    private int category;
 }

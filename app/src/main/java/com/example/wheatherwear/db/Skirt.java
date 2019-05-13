@@ -1,9 +1,11 @@
 package com.example.wheatherwear.db;
 
-public class Skirt {
+import org.litepal.crud.DataSupport;
+
+public class Skirt extends DataSupport {
     private int id;
     private String filePath;
-    private String category;
+    private int category;
 
     public String getName() {
         return name;
@@ -14,6 +16,7 @@ public class Skirt {
     }
 
     private String name;
+
     public int getId() {
         return id;
     }
@@ -30,11 +33,11 @@ public class Skirt {
         this.filePath = filePath;
     }
 
-    public String getCategory() {
+    public int getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(int category) {
         this.category = category;
     }
 }

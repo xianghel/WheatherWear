@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#D3D3D3"
     android:orientation="vertical"
-    tools:context=".ClothesActivity"
-    android:background="#D3D3D3">
+    tools:context=".ClothesActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/clothes_toolbar"
@@ -14,48 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-   <!-- <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/previous_text2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="32dp"
-                android:clickable="true"
-                android:text="返回"
-                android:textColor="#fff" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="衣柜"
-                android:textColor="#fff"
-                android:textSize="20sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/finish_text1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:clickable="true"
-            android:text="添加"
-            android:textColor="#fff" />
-    </RelativeLayout>-->
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -65,26 +24,26 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginRight="8dp">
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/coat"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="#fff"
                 android:clickable="true"
-                android:focusable="true"
-                android:background="#fff">
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
                     android:text="外套"
-                    android:textSize="24sp"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="24sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -100,9 +59,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
                     android:text="裙装"
-                    android:textSize="24sp"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="24sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,17 +69,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="#fff"
                 android:clickable="true"
-                android:focusable="true"
-                android:background="#fff">
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
                     android:text="内搭"
-                    android:textSize="24sp"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="24sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -128,17 +87,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="#fff"
                 android:clickable="true"
-                android:focusable="true"
-                android:background="#fff">
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
                     android:text="裤装"
-                    android:textSize="24sp"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="24sp" />
             </LinearLayout>
 
 
@@ -152,9 +111,8 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/clothes_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#fff">
-            </android.support.v7.widget.RecyclerView>
+                android:layout_height="match_parent"
+                android:background="#fff"></android.support.v7.widget.RecyclerView>
 
         </LinearLayout>
     </LinearLayout>
