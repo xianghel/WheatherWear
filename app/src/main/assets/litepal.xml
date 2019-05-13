@@ -3,12 +3,14 @@
 
     <dbname value="cool_weather" />
 
-    <version value="1" />
+    <version value="2" />
 
     <list>
-        <mapping class="com.example.wheatherwear.db.Province" />
         <mapping class="com.example.wheatherwear.db.City" />
-        <mapping class="com.example.wheatherwear.db.County" />
+        <mapping class="com.example.wheatherwear.db.Coat"/>
+        <mapping class="com.example.wheatherwear.db.Skirt"/>
+        <mapping class="com.example.wheatherwear.db.Inside"/>
+        <mapping class="com.example.wheatherwear.db.Pants"/>
     </list>
 
 </litepal>

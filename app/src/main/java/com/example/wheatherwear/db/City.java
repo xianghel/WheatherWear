@@ -10,9 +10,17 @@ public class City extends DataSupport {
 
     private String cityName;
 
-    private int cityCode;
+    private String cityId;
 
-    private int provinceId;
+    private String parentCity;
+
+    private String adminArea;
+
+    private String country;
+
+    private String addTime;
+
+    private int local;
 
     public int getId() {
         return id;
@@ -30,19 +38,54 @@ public class City extends DataSupport {
         this.cityName = cityName;
     }
 
-    public int getCityCode() {
-        return cityCode;
+    public String getCityId() {
+        return cityId;
     }
 
-    public void setCityCode(int cityCode) {
-        this.cityCode = cityCode;
+    public void setCityId(String cityId) {
+        this.cityId = cityId;
     }
 
-    public int getProvinceId() {
-        return provinceId;
+    public String getParentCity() {
+        return parentCity;
     }
 
-    public void setProvinceId(int provinceId) {
-        this.provinceId = provinceId;
+    public void setParentCity(String parentCity) {
+        this.parentCity = parentCity;
     }
+
+    public String getAdminArea() {
+        return adminArea;
+    }
+
+    public void setAdminArea(String adminArea) {
+        this.adminArea = adminArea;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(String addTime) {
+        this.addTime = addTime;
+    }
+
+    public int getLocal() {
+        return local;
+    }
+
+    public void setLocal(int local) {
+        this.local = local;
+    }
+
+
+
 }
