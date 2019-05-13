@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -28,12 +27,10 @@
 
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation"></activity>
+            android:configChanges="orientation" />
         <activity
             android:name=".WeatherActivity"
-            android:configChanges="orientation">
-
-        </activity>
+            android:configChanges="orientation" />
         <activity android:name=".LBSActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +42,20 @@
         <service
             android:name="com.baidu.location.f"
             android:exported="true"
-            android:process=":romote"></service>
+            android:process=":romote" />
+
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".ClothesActivity"
+            android:label="我的衣柜"></activity>
+        <provider
+            android:authorities="com.example.wheatherwear.fileprovider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>
