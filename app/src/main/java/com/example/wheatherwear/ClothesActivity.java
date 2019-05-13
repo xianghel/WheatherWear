@@ -1,12 +1,17 @@
 package com.example.wheatherwear;
 
 import android.Manifest;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,7 +38,11 @@ import com.example.wheatherwear.bean.LabelBean;
 import com.example.wheatherwear.util.SDCardUtil;
 import com.example.labels.LabelsView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -50,11 +59,13 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
 
     private File dir;
     private Uri imageUri;
+    private String path;
 
     private LabelsView labelsView;
 
     private static boolean havePermission;
     private static final int TAKE_PHOTO = 1;
+    private static final int CHOOSE_PHOTO = 2;
 
     private static final int COAT = 0;
     private static final int SKIRT = 1;
@@ -125,6 +136,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
                 switch (which) {
                     case 0:
                         File outputImage = new File(dir, System.currentTimeMillis() + ".jpg");
+                        path = outputImage.getPath();
                         try {
                             if (outputImage.exists()) {
                                 outputImage.delete();
@@ -139,6 +151,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
                         startActivityForResult(intent, TAKE_PHOTO);
                         break;
                     case 1:
+                        openAlbum();
                         break;
                     default:
                 }
@@ -151,6 +164,12 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
         alertDialog.show();
     }
 
+    private void openAlbum() {
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent, CHOOSE_PHOTO);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -159,8 +178,72 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
                     showPhotoConfirmationDialog();
                 }
                 break;
+            case CHOOSE_PHOTO:
+                handleImageOnKitKat(data);
+                break;
             default:
         }
+    }
+
+    private void handleImageOnKitKat(Intent data) {
+        String imagePath=null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://download/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = getImagePath(uri, null);
+            } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = uri.getPath();
+            }
+        }
+        File outputImage = new File(dir, System.currentTimeMillis() + ".jpg");
+        path = outputImage.getPath();
+        saveBitmap(path,openBitmap(imagePath));
+        showPhotoConfirmationDialog();
+    }
+
+    private void saveBitmap(String path, Bitmap bitmap) {
+        try {
+            BufferedOutputStream bos = new BufferedOutputStream(
+                    new FileOutputStream(path));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bos);
+            bos.flush();
+            bos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Bitmap openBitmap(String path) {
+        Bitmap bitmap = null;
+        try {
+            BufferedInputStream bis = new BufferedInputStream(
+                    new FileInputStream(path));
+            bitmap = BitmapFactory.decodeStream(bis);
+            bis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
     }
 
     @Override
@@ -187,6 +270,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
             default:
         }
     }
+
 
     private void initDir() {
         if (SDCardUtil.checkSdCard()) {
@@ -225,7 +309,7 @@ public class ClothesActivity extends AppCompatActivity implements View.OnClickLi
         RelativeLayout relativeLayout = dialogView.findViewById(R.id.add_ok);
         relativeLayout.setOnClickListener(this);
         ImageView imageView = dialogView.findViewById(R.id.image);
-        Glide.with(this).load(imageUri).into(imageView);
+        Glide.with(this).load(path).into(imageView);
         labelsView = dialogView.findViewById(R.id.labels);
         setLabelList();
         customizeDialog = customizeDialogBuilder.create();
